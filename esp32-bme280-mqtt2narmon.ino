@@ -1,23 +1,21 @@
 /*
- MQTT IOT Example
- */
+transmiting data from wemos r32 (esp32) with sensor BME280 to narodmon.ru across mqtt
+*/
 
 #include <SPI.h>
 #include <WiFi.h>
+// --
 const char* ssid = "....";
 const char* password = "....";
+// --
  
-
 #include <PubSubClient.h>
-
-
-
-
+//---
 #define MAC "xxxxxxxxxx" 
 #define PASS "xxxxx"
 #define USERNAME "......" 
 #define TOPIC "login/esp32/"
-
+//--
 
 char server[] = "narodmon.ru";
 char authMethod[] = USERNAME;
@@ -99,32 +97,6 @@ void setup()
 
 void loop()
 {
-/* 
-    //sleep - wakeup
-    struct timeval now;
-    Serial.println("wakeup: start ESP32 loop \n");
-    gettimeofday(&now, NULL);
-
-     bme.readSensor();      //получили данные с датчика
-     // отправка на сервер
-     gotTemp();
-     delay(5);
-     gotHumidity();
-     delay(5);
-     gotPressure();
-     delay(5);
-
-    // close mqtt-connection
-    client.disconnect();
-    // .. and go sleep
-//    Serial.println("deep sleep (%lds since last reset, %lds since last boot)\n",now.tv_sec,now.tv_sec-last);
-    Serial.print("last=");  Serial.println(last);
-    Serial.print("go deep sleep (%lds since last reset, %lds since last boot)\n");     Serial.print(now.tv_sec); Serial.print("; "); Serial.println(now.tv_sec-last);
-    last = now.tv_sec;
-    Serial.print("last=");  Serial.println(last);
-    esp_deep_sleep(1000000LL * GPIO_DEEP_SLEEP_DURATION);
-*/
-  //delay(5000);
 }
 
 
@@ -183,21 +155,6 @@ void doPublish(String id, String value) {
 
 
 // получаем данные - gotXxxx и публикуем
-/*  слизанный кусок кода  - получаем данные
-void gotReading(uint8_t *adv_data) {
-  // This data is from the test ESP32 beacon
-  uint16_t wakeupCount = (int16_t)((adv_data[11] << 8) | adv_data[10]);
-  Serial.printf("My BLE device wakeup count=%i\n", wakeupCount);
-  doPublish("wakeup", String(wakeupCount));
-}
-
-void gotTempoReading(uint8_t *adv_data) {
-  // this data is from the "Tempo" device sends which send the temperature in a two byte field
-  float temp = ((int16_t)((adv_data[27] << 8) | adv_data[26])) / 10.0;
-  Serial.printf("My Tempo temp=%0.1f\n", temp);
-  doPublish("temp", String(temp, 1));
-}
-*/
 
 void gotTemp() {
      //
