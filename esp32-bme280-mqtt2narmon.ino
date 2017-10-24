@@ -12,7 +12,7 @@ const char* password = "....";
 #include <WiFiUdp.h>
 IPAddress timeServerIP; 
 const char* ntpServerName = "time.nist.gov";
-int TIMEZONE=5;
+int TIMEZONE=3;
 const int NTP_PACKET_SIZE = 48; 
 byte packetBuffer[ NTP_PACKET_SIZE]; 
 WiFiUDP udp;
@@ -55,6 +55,7 @@ void setup()
 
   // Start the ethernet client, open up serial port for debugging
   Serial.begin(115200);
+  delay(300);  //пишут, что надо время на запуск...
   setup_wifi();
 
 
@@ -72,7 +73,7 @@ void setup()
     //sleep - wakeup
     struct timeval now;
     Serial.println("wakeup: start ESP32 loop \n");
-    gettimeofday(&now, NULL);
+    gettimeofday(&now, NULL);  //получить приблизительное время от системы. для индикации сколько спали.
 
      GetNTP();    //получили время, в seril отобразилось.
  
@@ -112,7 +113,7 @@ void loop()
 
 
 // ================
-// ================
+// ==WIFI ================
 void setup_wifi() {
 
   delay(10);
@@ -136,7 +137,7 @@ void setup_wifi() {
   Serial.println(WiFi.localIP());
 }
 
-// ==публикация
+// ==MQTT ==публикация
 void doPublish(String id, String value) {
 // если не подключен, то подключаемся. Висит пока не подключится!!
   if (!!!client.connected()) {
@@ -189,6 +190,8 @@ void gotPressure() {
     Serial.printf("My pressure=%0.1f\n", pressure);
     doPublish("p0", String(pressure, 1));
 }
+
+// ==== NTP===
 /**
  * Посылаем и парсим запрос к NTP серверу
  */
@@ -220,6 +223,18 @@ bool GetNTP(void) {
     ntp_time = epoch + TIMEZONE*3600;    
     Serial.print("Unix time = ");
     Serial.println(ntp_time);
+// и в привычном виде:
+   uint16_t s = ( ntp_time )%60;
+   uint16_t m = ( ntp_time/60 )%60;
+   uint16_t h = ( ntp_time/3600 )%24;
+   Serial.print("Time: ");
+   Serial.print(h);
+   Serial.print(":");
+   Serial.print(m);
+   Serial.print(":");
+   Serial.println(s);
+   //---
+ 
   }
   return true;
 }
