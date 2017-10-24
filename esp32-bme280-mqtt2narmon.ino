@@ -15,6 +15,7 @@ const char* ntpServerName = "time.nist.gov";
 int TIMEZONE=3;
 const int NTP_PACKET_SIZE = 48; 
 byte packetBuffer[ NTP_PACKET_SIZE]; 
+unsigned long ntp_time = 0;
 WiFiUDP udp;
  
 #include <PubSubClient.h>
@@ -75,7 +76,7 @@ void setup()
     Serial.println("wakeup: start ESP32 loop \n");
     gettimeofday(&now, NULL);  //получить приблизительное время от системы. для индикации сколько спали.
 
-     GetNTP();    //получили время, в seril отобразилось.
+     GetNTP();    //получили время, записано в ntp_time, в seril отобразилось. можно использовать где-нибудь еще 
  
      bme.readSensor();      //получили данные с датчика
      delay(1000);
