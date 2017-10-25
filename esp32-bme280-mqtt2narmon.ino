@@ -10,19 +10,19 @@ const char* password = "....";
 // --
 
 #include <WiFiUdp.h>
-IPAddress timeServerIP; 
+IPAddress timeServerIP;
 const char* ntpServerName = "time.nist.gov";
 int TIMEZONE=3;
-const int NTP_PACKET_SIZE = 48; 
-byte packetBuffer[ NTP_PACKET_SIZE]; 
+const int NTP_PACKET_SIZE = 48;
+byte packetBuffer[ NTP_PACKET_SIZE];
 unsigned long ntp_time = 0;
 WiFiUDP udp;
- 
+
 #include <PubSubClient.h>
 //---
-#define MAC "xxxxxxxxxx" 
+#define MAC "xxxxxxxxxx"
 #define PASS "xxxxx"
-#define USERNAME "......" 
+#define USERNAME "......"
 #define TOPIC "login/esp32/"
 //--
 
@@ -36,7 +36,7 @@ char conntopic[] = TOPIC "status";
 #include <Wire.h>
 #include "cactus_io_BME280_I2C.h"
 // Create the BME280 object
-BME280_I2C bme;              // I2C using default 0x77 
+BME280_I2C bme;              // I2C using default 0x77
 // or BME280_I2C bme(0x76);  // I2C using address 0x76
 float pressure = 0.0;
 float temp = 0.0;
@@ -56,7 +56,7 @@ void setup()
 
   // Start the ethernet client, open up serial port for debugging
   Serial.begin(115200);
-  delay(300);  //пишут, что надо время на запуск...
+//  delay(300);  //пишут, что надо время на запуск...
   setup_wifi();
 
 
@@ -69,15 +69,15 @@ void setup()
 
   bme.setTempCal(-1);  //correct data
 
- 
+
 //=====
     //sleep - wakeup
     struct timeval now;
     Serial.println("wakeup: start ESP32 loop \n");
     gettimeofday(&now, NULL);  //получить приблизительное время от системы. для индикации сколько спали.
 
-     GetNTP();    //получили время, записано в ntp_time, в seril отобразилось. можно использовать где-нибудь еще 
- 
+     GetNTP();    //получили время, записано в ntp_time, в seril отобразилось. можно использовать где-нибудь еще
+
      bme.readSensor();      //получили данные с датчика
      delay(1000);
      bme.readSensor();      //получили данные с датчика
@@ -100,9 +100,6 @@ void setup()
     Serial.print("last=");  Serial.println(last);
     esp_deep_sleep(1000000LL * GPIO_DEEP_SLEEP_DURATION);
 
- 
-
-
 }
 
 
@@ -124,10 +121,17 @@ void setup_wifi() {
   Serial.println(ssid);
 
   WiFi.begin(ssid, password);
-
-  while (WiFi.status() != WL_CONNECTED) {
+  int i = 0;
+  while (WiFi.status() != WL_CONNECTED && i < 50) {
     delay(500);
+    i++;
     Serial.print(".");
+  }
+  // если до сих пор нет подключения - перегрузить.
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("WiFi Connection failed, restart");
+    WiFi.disconnect();
+    ESP.restart();
   }
 
   randomSeed(micros());
@@ -147,7 +151,7 @@ void doPublish(String id, String value) {
         Serial.print(".");
         delay(500);
      }
-     Serial.print("connected with: "); Serial.print(clientId); Serial.print(authMethod); Serial.print(token); 
+     Serial.print("connected with: "); Serial.print(clientId); Serial.print(authMethod); Serial.print(token);
      Serial.println();
   }
 
@@ -197,10 +201,10 @@ void gotPressure() {
  * Посылаем и парсим запрос к NTP серверу
  */
 bool GetNTP(void) {
-  WiFi.hostByName(ntpServerName, timeServerIP); 
-  sendNTPpacket(timeServerIP); 
+  WiFi.hostByName(ntpServerName, timeServerIP);
+  sendNTPpacket(timeServerIP);
   delay(1000);
-  
+
   int cb = udp.parsePacket();
   if (!cb) {
     Serial.println("No packet yet");
@@ -209,10 +213,10 @@ bool GetNTP(void) {
   else {
     Serial.print("packet received, length=");
     Serial.println(cb);
-// Читаем пакет в буфер    
-    udp.read(packetBuffer, NTP_PACKET_SIZE); 
-// 4 байта начиная с 40-го сождержат таймстамп времени - число секунд 
-// от 01.01.1900   
+// Читаем пакет в буфер
+    udp.read(packetBuffer, NTP_PACKET_SIZE);
+// 4 байта начиная с 40-го сождержат таймстамп времени - число секунд
+// от 01.01.1900
     unsigned long highWord = word(packetBuffer[40], packetBuffer[41]);
     unsigned long lowWord = word(packetBuffer[42], packetBuffer[43]);
 // Конвертируем два слова в переменную long
@@ -221,7 +225,7 @@ bool GetNTP(void) {
     const unsigned long seventyYears = 2208988800UL;
     unsigned long epoch = secsSince1900 - seventyYears;
 // Делаем поправку на местную тайм-зону
-    ntp_time = epoch + TIMEZONE*3600;    
+    ntp_time = epoch + TIMEZONE*3600;
     Serial.print("Unix time = ");
     Serial.println(ntp_time);
 // и в привычном виде:
@@ -235,11 +239,11 @@ bool GetNTP(void) {
    Serial.print(":");
    Serial.println(s);
    //---
- 
+
   }
   return true;
 }
- 
+
 /**
  * Посылаем запрос NTP серверу на заданный адрес
  */
@@ -259,11 +263,7 @@ unsigned long sendNTPpacket(IPAddress& address)
   packetBuffer[14]  = 49;
   packetBuffer[15]  = 52;
 // Посылаем запрос на NTP сервер (123 порт)
-  udp.beginPacket(address, 123); 
+  udp.beginPacket(address, 123);
   udp.write(packetBuffer, NTP_PACKET_SIZE);
   udp.endPacket();
 }
-
-
-
-
