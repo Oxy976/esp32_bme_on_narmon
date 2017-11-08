@@ -2,36 +2,20 @@
 transmiting data from wemos r32 (esp32) with sensor BME280 to narodmon.ru across mqtt
 */
 
+#include "settings.h"
+
 #include <SPI.h>
 #include <WiFi.h>
-// --
-const char* ssid = "....";
-const char* password = "....";
-// --
+
 
 #include <WiFiUdp.h>
 IPAddress timeServerIP;
-const char* ntpServerName = "time.nist.gov";
-int TIMEZONE=3;
 const int NTP_PACKET_SIZE = 48;
 byte packetBuffer[ NTP_PACKET_SIZE];
 unsigned long ntp_time = 0;
 WiFiUDP udp;
 
 #include <PubSubClient.h>
-//---
-#define MAC "xxxxxxxxxx"
-#define PASS "xxxxx"
-#define USERNAME "......"
-#define TOPIC "login/esp32/"
-//--
-
-char server[] = "narodmon.ru";
-char authMethod[] = USERNAME;
-char token[] = PASS;
-char clientId[] = MAC;
-char conntopic[] = TOPIC "status";
-
 
 #include <Wire.h>
 #include "cactus_io_BME280_I2C.h"
