@@ -6,18 +6,25 @@ const char* password = "....";
 
 // Time settings
 const char* ntpServerName = "time.nist.gov";
-int TIMEZONE=3;
+const int TIMEZONE=3;
 
 // narmon
 //---
-#define MAC "xxxxxxxxxx"
+/*#define MAC "xxxxxxxxxx"
 #define PASS "xxxxx"
 #define USERNAME "......"
 #define TOPIC "login/esp32/"
+*/
+const char* SRV = "narodmon.ru";
+const char* MAC = "....";
+const char* PASS = "....";
+const char* USERNAME = "....";
+const char* TOPIC = "login/esp32/";
+
 //--
 
 //mqtt4narmon
-char server[] = "narodmon.ru";
+char server[] = SRV ;
 char authMethod[] = USERNAME;
 char token[] = PASS;
 char clientId[] = MAC;
