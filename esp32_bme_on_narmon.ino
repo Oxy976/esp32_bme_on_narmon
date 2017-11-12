@@ -27,7 +27,7 @@ float temp = 0.0;
 float humidity = 0.0;
 
 //sleep
-#define GPIO_DEEP_SLEEP_DURATION     420  // sleep ... seconds and then wake up
+#define GPIO_DEEP_SLEEP_DURATION     600  // sleep ... seconds and then wake up
 RTC_DATA_ATTR static time_t last;        // remember last boot in RTC Memory
 
 
@@ -40,8 +40,10 @@ void setup()
 
   // Start the ethernet client, open up serial port for debugging
   Serial.begin(115200);
-//  delay(300);  //пишут, что надо время на запуск...
-  setup_wifi();
+  pinMode(LED_BUILTIN, OUTPUT);
+  //  delay(300);  //пишут, что надо время на запуск...
+   digitalWrite(LED_BUILTIN, HIGH);
+   setup_wifi();
 
 
  // init sensor
@@ -82,8 +84,12 @@ void setup()
     Serial.print("go deep sleep (%lds since last reset, %lds since last boot)\n");     Serial.print(now.tv_sec); Serial.print("; "); Serial.println(now.tv_sec-last);
     last = now.tv_sec;
     Serial.print("last=");  Serial.println(last);
-    esp_deep_sleep(1000000LL * GPIO_DEEP_SLEEP_DURATION);
-
+ //спать...  
+   esp_sleep_enable_timer_wakeup(1000000LL * GPIO_DEEP_SLEEP_DURATION);  
+   Serial.println("Setup ESP32 to sleep for every " + String(GPIO_DEEP_SLEEP_DURATION) + " Seconds");
+   Serial.println("Going to sleep now");
+   digitalWrite(LED_BUILTIN, LOW);
+   esp_deep_sleep_start();
 }
 
 
