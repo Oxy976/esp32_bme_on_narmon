@@ -5,7 +5,7 @@ const char* password = "xxx";
 // --
 
 // Time settings
-const char* ntpServerName = "xxx";
+const char* ntpServerName = "pool.ntp.org";
 const int TIMEZONE=3;
 
 // narmon
